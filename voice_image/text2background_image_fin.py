@@ -38,10 +38,12 @@ class ModelConverter:
         gc.collect()           # 더 이상 사용되지 않을 객체의 메모리 삭제
 
     def convert_model_to_ov(self, model: torch.nn.Module, ir_path:Path, input_info: List[tuple]):     # 실제 모델 변환 수행
+        
         model.eval()                      # 모델을 추론 모드로 변경                            
-        with torch.no_grad():             # 메모리 사용량 감소를 위한 그래디언트 계산 비활성화                       
-            ov_model = ov.convert_model(model, ir_path, input_info)     # 모델을 OpenVINO의 IR 형식으로 변환
-        ov.save_model(ov_model, ir_path) #변환된 IR 모델을 지정된 경로에 저장
+        with torch.no_grad():             # 메모리 사용량 감소를 위한 그래디언트 계산 비활성화    
+            model_filename = ir.path.name                   
+            ov_model = ov.convert_model(model, model_filename, input_info)     # 모델을 OpenVINO의 IR 형식으로 변환
+        ov.save_model(ov_model, model_filename) #변환된 IR 모델을 지정된 경로에 저장
         del ov_model                     # 메모리에서 IR 모델을 삭제
         self.cleanup_torchscript_cache()      # PyTorch JIT 컴파일러 캐시를 정리
         print(f'Text Encoder successfully converted to IR and saved to {ir_path}')    # 변환 및 저장이 완료됨을 출력
@@ -80,9 +82,10 @@ class ModelConverter:
 # vae_encoder_ov_path = Path("vae_encoder.xml")
 # vae_decorder_ov_path = Path("vae_decoder.xml")
 class Encoder:
-    def __init__(self):
+    def __init__(self, vae):
         self.ov_cache = {}
-    
+        self.vae_encoder_ov_path = Path("./voice_image/vae_encoder.xml")
+        
     def convert_vae_encoder(self, vae: torch.nn.Module, ir_path: Path):
         class VAEEncoderWrapper(torch.nn.Module):
             def __init__(self, vae):
@@ -102,15 +105,11 @@ class Encoder:
         
         torch.jit.clear_autodetected_analyzers()
 
-    vae_encoder_ov_path = Path("vae_encoder.xml")
-    if not vae_encoder_ov_path.exists():
-        convert_vae_encoder(vae, vae_encoder_ov_path)
-    else:
-        print(f"VAE encoder will be loaded from {vae_encoder_ov_path}")
-
+    
 class Decorder:
     def __init__(self):
         self.ov_cache = {}
+        self.vae_decorder_ov_path = Path("./voice_image/vae_decoder.xml")
 
     def convert_vae_decoder(self, vae: torch.nn.Module, ir_path: Path):
         class VAEDecoderWrapper(torch.nn.Module):
@@ -131,12 +130,6 @@ class Decorder:
         print(f'VAE decoder successfully converted to IR and saved to {ir_path}')
         
         torch.jit.clear_autodetected_analyzers()
-    vae_decorder_ov_path = Path("vae_decoder.xml")
-    if not vae_decorder_ov_path.exists():
-        convert_vae_decoder(vae, vae_decorder_ov_path)
-        gc.collect()
-    else:
-        print(f"VAE decoder will be loaded from {vae_decorder_ov_path}")
 
 class ImageSize:
     # 주어진 이미지 출력창 크기 조정 (원본 image -> 조정 dst)
@@ -246,6 +239,9 @@ class OVStableDiffusionPipeline(DiffusionPipeline):
                 image = self.vae_decoder(latents * (1 / 0.18215))[self._vae_d_output]
                 image = self.postprocess_image(image, meta, output_type)
                 img_buffer.extend(image)
+            ########################################################
+            # yield i
+            ########################################################
 
         # scale and decode the image latents with vae
         image = self.vae_decoder(latents * (1 / 0.18215))[self._vae_d_output]
@@ -367,10 +363,10 @@ class TextToImageGenerator:
         return self.core.compile_model(model_path, device, config)
 
     def create_ov_pipe(self):
-        TEXT_ENCODER_OV_PATH = Path("text_encoder.xml")
-        UNET_OV_PATH = Path('unet.xml')
-        VAE_ENCODER_OV_PATH = Path("vae_encoder.xml")
-        VAE_DECODER_OV_PATH = Path('vae_decoder.xml')
+        TEXT_ENCODER_OV_PATH = Path('./voice_image/text_encoder.xml')
+        UNET_OV_PATH = Path('./voice_image/unet.xml')
+        VAE_ENCODER_OV_PATH = Path('./voice_image/vae_encoder.xml')
+        VAE_DECODER_OV_PATH = Path('./voice_image/vae_decoder.xml')
 
         tokenizer = CLIPTokenizer.from_pretrained('openai/clip-vit-large-patch14')
         lms = LMSDiscreteScheduler(
@@ -413,8 +409,12 @@ class TextToImageGenerator:
         steps_input = widgets.IntText(min=1, max=50, value=steps, description='steps:')
 
         ov_pipe = self.create_ov_pipe()
+        ###############################################
+        # for _ in range(steps):
+            # yield ov_pipe(text_input.value, num_inference_steps=steps_input.value, seed=seed_input.value)
+        ###############################################
+
         result = ov_pipe(text_input.value, num_inference_steps=steps_input.value, seed=seed_input.value)
 
         new_background = random.choice(result['sample'])
-        new_background.save('new_background.jpg')
-        new_background.show()
+        new_background.save('./ACGPN/Data_preprocessing/test_background/background.png')

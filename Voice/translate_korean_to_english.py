@@ -20,5 +20,5 @@ def translate_korean_to_english(input_file, output_file):
             print(f"번역 결과: {english_translation}")
 
 # 모듈로 사용할 때는 직접 실행하지 않고 함수를 호출할 수 있도록 합니다.
-if __name__ == "__main__":
-    translate_korean_to_english("text.txt", "english.txt")
+# if __name__ == "__main__":
+#     translate_korean_to_english("text.txt", "english.txt")
