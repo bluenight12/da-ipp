@@ -1,1 +1,4 @@
-.pyc
+*.pyc
+*.pth
+*.caffemodel
+*.bin
