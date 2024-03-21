@@ -1,6 +1,6 @@
 # Da-Ipp
 
-* (간략히 프로젝트를 설명하고, 최종 목표가 무엇인지에 대해 기술)
+* 다입은 '다 입게해줄게'라는 뜻으로, 의류 매장에 등록되어 있는 옷들을 바탕으로 옷을 데이터베이스에 넣어 직접 선택해 입혀주거나 고객이 선택하기 힘들다면 말(Speech-to-Text)로 추천을 받아 랜덤으로 그와 비슷한 옷을 입혀주고 배경을 바꾸고 싶다면 배경까지 바꿔서 본인의 의상 착용샷을 보여주는 의류 매장 AI 키오스크
 
 ## High Level Design
 
@@ -11,7 +11,7 @@
 * (각 팀에서 프로젝트를 위해 생성한 repository에 대한 code clone 방법에 대해서 기술)
 
 ```shell
-git clone https://github.com/xxx/yyy/zzz
+git clone https://github.com/bluenight12/da-ipp
 ```
 
 ## Prerequite
@@ -24,18 +24,6 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Steps to build
-
-* (프로젝트를 실행을 위해 빌드 절차 기술)
-
-```shell
-cd ~/xxxx
-source .venv/bin/activate
-
-make
-make install
-```
-
 ## Steps to run
 
 * (프로젝트 실행방법에 대해서 기술, 특별한 사용방법이 있다면 같이 기술)
@@ -45,7 +33,7 @@ cd ~/xxxx
 source .venv/bin/activate
 
 cd /path/to/repo/xxx/
-python demo.py -i xxx -m yyy -d zzz
+python widgets.py
 ```
 
 ## Output
@@ -56,4 +44,4 @@ python demo.py -i xxx -m yyy -d zzz
 
 ## Appendix
 
-* (참고 자료 및 알아두어야할 사항들 기술)
+* ACGPN : https://github.com/switchablenorms/DeepFashion_Try_On
