@@ -12,7 +12,7 @@ pip를 사용하여 설치할 수 있습니다:
 ```
 pip install opencv-python
 pip install mediapipe
-pip install pyautogui
+pip install pynput
 ```
 
 ## 사용법
@@ -48,9 +48,8 @@ cv2.destroyAllWindows()
 * MediaPipe Hands
 	* https://developers.google.com/mediapipe/solutions/vision/gesture_recognizer/python#live-stream_1
 	* https://developers.google.com/mediapipe/solutions/vision/gesture_recognizer/index#models
-* PyAutoGUI
-	* https://pyautogui.readthedocs.io/en/latest/mouse.html
+
 
 ## 주의사항
 * 이 코드는 웹캠이 필요합니다. 웹캠이 연결되어 있지 않거나 다른 프로그램에서 사용 중인 경우, 코드가 제대로 작동하지 않을 수 있습니다.
-* pyautogui 라이브러리는 GUI 자동화를 위한 것으로, 마우스와 키보드를 제어합니다. 따라서 이 코드를 실행할 때는 컴퓨터가 마우스와 키보드 입력을 받을 수 있는 상태여야 합니다.
+
