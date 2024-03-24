@@ -6,7 +6,7 @@
 
 - cv2
 - mediapipe
-- pyautogui
+- pynput
 
 pip를 사용하여 설치할 수 있습니다:
 ```
